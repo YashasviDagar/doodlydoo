@@ -1,0 +1,549 @@
+/* Pacifico (SIL OFL) - self-hosted, latin subset only. Brush-script base shape for the wordmark -
+   naturally upright (unlike Yellowtail, whose slant read as too italic and couldn't be corrected
+   with a CSS skew without warping the letterforms); actual bristle/dry-brush texture comes from
+   the SVG filters in index.html. */
+@font-face {
+  font-family: "Pacifico";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/pacifico.woff2") format("woff2");
+}
+
+:root {
+  /* Cyber Electric palette - cool obsidian neutrals with a cyan interactive accent.
+     Blue is reserved for the logo wordmark alone (--brand).
+
+     Color jobs:
+     --accent (cyan): interactive emphasis - focus rings, hover glow, active/selected states.
+     --brand (indigo): the brush-script logo only. Nothing else.
+     --secondary-*: neutral hover/emphasis for interactive elements that aren't accent moments.
+     --highlight (amber): status labels ("invited", "pending") - a glance, not an action. */
+  --text: #64748b;
+  --text-h: #e2e8f0;
+  --bg: #0b0f17;
+  --surface: #161b26;
+  --border: rgba(255, 255, 255, 0.08);
+  --code-bg: #1e293b;
+  --brand: #7c85ff;
+  --accent: #06b6d4;
+  --accent-glow: 0 0 12px rgba(34, 211, 238, 0.3);
+  --accent-bg: rgba(34, 211, 238, 0.1);
+  --accent-border: rgba(34, 211, 238, 0.5);
+  --emerald: #10b981;
+  --secondary-bg: rgba(226, 232, 240, 0.06);
+  --secondary-border: rgba(226, 232, 240, 0.24);
+  --highlight: #ffc670;
+  --highlight-bg: rgba(255, 182, 72, 0.16);
+  --danger: #ff6b6b;
+  --danger-bg: rgba(255, 107, 107, 0.12);
+  --social-bg: rgba(47, 48, 58, 0.5);
+  --shadow:
+    rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+
+  --radius: 10px;
+  --radius-sm: 7px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font: 18px/145% var(--sans);
+  letter-spacing: 0.18px;
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #8b96a8;
+    --text-h: #eceff5;
+    --bg: #0b0f17;
+    --surface: #161b26;
+    --border: rgba(255, 255, 255, 0.08);
+    --code-bg: #1e293b;
+    --brand: #7c85ff;
+    --accent: #06b6d4;
+    --accent-glow: 0 0 12px rgba(34, 211, 238, 0.3);
+    --accent-bg: rgba(34, 211, 238, 0.1);
+    --accent-border: rgba(34, 211, 238, 0.5);
+    --secondary-bg: rgba(236, 239, 245, 0.07);
+    --secondary-border: rgba(236, 239, 245, 0.28);
+    --highlight: #ffc670;
+    --highlight-bg: rgba(255, 182, 72, 0.16);
+    --danger: #ff6b6b;
+    --danger-bg: rgba(255, 107, 107, 0.12);
+    --social-bg: rgba(47, 48, 58, 0.5);
+    --shadow:
+      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+  }
+
+  #social .button-icon {
+    filter: invert(1) brightness(2);
+  }
+}
+
+#root {
+  width: 1126px;
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  border-inline: 1px solid var(--border);
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+h1,
+h2 {
+  font-family: var(--heading);
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+h1 {
+  font-size: 56px;
+  letter-spacing: -1.68px;
+  margin: 32px 0;
+  @media (max-width: 1024px) {
+    font-size: 36px;
+    margin: 20px 0;
+  }
+}
+h2 {
+  font-size: 24px;
+  line-height: 118%;
+  letter-spacing: -0.24px;
+  margin: 0 0 8px;
+  @media (max-width: 1024px) {
+    font-size: 20px;
+  }
+}
+p {
+  margin: 0;
+}
+
+code,
+.counter {
+  font-family: var(--mono);
+  display: inline-flex;
+  border-radius: 4px;
+  color: var(--text-h);
+}
+
+code {
+  font-size: 15px;
+  line-height: 135%;
+  padding: 4px 8px;
+  background: var(--code-bg);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ---------- App shell / layout ---------- */
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-5);
+}
+
+.brand-lockup {
+  display: inline-block;
+  text-decoration: none;
+  color: inherit;
+}
+/* Yellowtail gives the base brush-script letterforms (real thick/thin variation from a flexible
+   brush pen); the SVG filters (defined once in index.html) add the actual bristle roughness and
+   dry-brush patchiness on top - a font alone reads too clean/printed. Two variants because the
+   hero-strength texture turns to noisy mush at small navbar sizes - see index.html's comment. */
+.brand-word {
+  font-family: "Pacifico", cursive;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--brand);
+  display: inline-block;
+}
+.brand-word--compact {
+  font-size: 28px;
+  filter: url(#brush-compact);
+}
+.brand-word--hero {
+  font-size: 52px;
+  filter: url(#brush-hero);
+}
+
+.page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--space-6) var(--space-6);
+  text-align: left;
+}
+
+.auth-shell {
+  flex: 1;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6) var(--space-4);
+  text-align: left;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 380px;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  appearance: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-h);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.05s ease;
+}
+.btn:hover:not(:disabled) {
+  border-color: var(--secondary-border);
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text-h);
+  font-weight: 600;
+}
+.btn-primary:hover:not(:disabled) {
+  border-color: var(--accent);
+  box-shadow: var(--accent-glow);
+}
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--secondary-bg);
+  border-color: transparent;
+}
+.btn-sm {
+  padding: 5px 11px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+/* ---------- Form controls ---------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field label {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.input {
+  appearance: none;
+  font: inherit;
+  font-size: 14px;
+  color: var(--text-h);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  width: 100%;
+}
+.input:focus {
+  outline: 2px solid var(--accent-border);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+.input::placeholder {
+  color: var(--text);
+  opacity: 0.75;
+}
+
+/* ---------- Layout helpers ---------- */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.muted {
+  color: var(--text);
+  font-size: 13px;
+}
+.error-text {
+  color: var(--danger);
+  font-size: 13px;
+  margin: 0;
+}
+
+/* ---------- Cards / surfaces ---------- */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-5);
+  box-shadow: var(--shadow);
+}
+
+/* ---------- Boards list ---------- */
+
+.board-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-2) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.board-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: var(--text-h);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.board-list-item:hover {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+/* Amber, not indigo - this is a status label ("invited", "pending"), not an action, so it
+   shouldn't compete visually with real buttons/active states. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--highlight-bg);
+  color: var(--highlight);
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+
+/* ---------- Presence / pills ---------- */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  background: var(--code-bg);
+  color: var(--text-h);
+  border-radius: 999px;
+  padding: 4px 10px 4px 6px;
+}
+.pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* ---------- Board toolbar ---------- */
+
+.toolbar {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-3) 0;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-3);
+}
+.toolbar-group {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding-right: var(--space-4);
+  border-right: 1px solid var(--border);
+}
+.toolbar-group:last-child {
+  border-right: none;
+  padding-right: 0;
+}
+
+/* Below this width the toolbar wraps one group per row (see .toolbar's flex-wrap) - the
+   border-right dividers only make sense in a single horizontal row, so drop them and rely on
+   the wrap gap for separation instead. */
+@media (max-width: 640px) {
+  .toolbar-group {
+    border-right: none;
+    padding-right: 0;
+  }
+}
+
+.tool-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 11px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.tool-btn:hover {
+  border-color: var(--accent-border);
+  box-shadow: var(--accent-glow);
+}
+.tool-btn[aria-pressed="true"] {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+  border: 2px solid transparent;
+  box-shadow: 0 0 0 1px var(--border);
+}
+.swatch[aria-pressed="true"] {
+  border-color: var(--accent);
+  box-shadow: var(--accent-glow);
+}
+
+/* ---------- Range slider (brush size) ---------- */
+
+input[type="range"] {
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: #1e293b;
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  box-shadow: var(--accent-glow);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  box-shadow: var(--accent-glow);
+}
+
+/* ---------- Popups / notifications ---------- */
+
+.popup-stack {
+  position: fixed;
+  top: var(--space-4);
+  right: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  z-index: 1000;
+  max-width: calc(100vw - 32px);
+}
+
+/* ---------- Canvas ---------- */
+
+/* setupCanvasDpr sets an inline px width/height on the canvas elements for crisp DPR rendering;
+   this overrides that (only !important in an author stylesheet beats a plain inline style) so
+   the canvas visually scales to fit its responsive wrapper on narrow viewports. The backing
+   pixel resolution and drawing coordinate space are untouched - see CanvasBoard's getPos(). */
+.canvas-scale-wrap canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.popup-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  box-shadow: var(--shadow);
+  width: 270px;
+  max-width: 100%;
+  text-align: left;
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 0 var(--space-4) var(--space-4);
+  }
+  .popup-stack {
+    left: var(--space-3);
+    right: var(--space-3);
+  }
+  .popup-card {
+    width: 100%;
+  }
+}

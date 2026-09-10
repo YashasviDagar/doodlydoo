@@ -1,0 +1,16 @@
+{
+  "name": "doodlydoo",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "concurrently -n db,server,client -c blue,green,magenta \"npm:db:dev\" \"npm:server:dev\" \"npm:client:dev\"",
+    "db:dev": "npm run db:dev --prefix server",
+    "server:dev": "npm run dev --prefix server",
+    "client:dev": "npm run dev --prefix client",
+    "demo": "node scripts/demo-convergence.mjs"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "playwright": "^1.48.2"
+  }
+}

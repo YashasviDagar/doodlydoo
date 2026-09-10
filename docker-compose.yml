@@ -1,0 +1,25 @@
+# Reference / production-parity setup. Local dev on this machine does NOT use this file
+# (no Docker available here — see PLAN.md deviation #1 for the zero-install substitute).
+# If you have Docker available, `docker compose up` gives you real Postgres + Redis matching
+# what Railway provides in production.
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: doodlydoo
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:

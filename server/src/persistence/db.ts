@@ -1,0 +1,23 @@
+import pg from "pg";
+import { env } from "../config/env.js";
+import { logger } from "../logger.js";
+
+export const pool = new pg.Pool({ connectionString: env.databaseUrl, max: env.pgPoolMax });
+
+// Critical: node-postgres emits 'error' on the pool for problems with IDLE clients (e.g. the
+// server dropping a pooled connection that isn't in the middle of a query) - not just rejected
+// query promises. An EventEmitter 'error' with no listener is fatal to the whole process by
+// default, bypassing every try/catch in the codebase. This is what actually crashed the server -
+// see PLAN.md for the root-cause writeup.
+pool.on("error", (err) => {
+  logger.error({ err }, "unexpected error on idle pg client - pool recovers automatically");
+});
+
+export async function checkDbConnection(): Promise<boolean> {
+  try {
+    await pool.query("select 1");
+    return true;
+  } catch {
+    return false;
+  }
+}

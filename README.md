@@ -1,8 +1,25 @@
-# doodlydoo
+<div align="center">
 
-A real-time collaborative paint app — multiple people draw on the same canvas simultaneously and
-see each other's strokes live, with per-user undo, presence/cursors, durable persistence, and
-access-controlled private boards.
+# ✏️ doodlydoo
+
+*Real-time collaborative painting — draw together, see every stroke live, sync like magic.*
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black)](https://react.dev)
+[![Node.js](https://img.shields.io/badge/Node.js-22-green?logo=node.js&logoColor=white)](https://nodejs.org)
+[![Express](https://img.shields.io/badge/Express-000000?logo=express&logoColor=white)](https://expressjs.com)
+[![Yjs CRDT](https://img.shields.io/badge/Yjs-CRDT-FED148)](https://github.com/yjs/yjs)
+[![WebSocket](https://img.shields.io/badge/WebSocket-ws-0085CC)](https://github.com/websockets/ws)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org)
+[![Redis](https://img.shields.io/badge/Redis-DC382D?logo=redis&logoColor=white)](https://redis.io)
+[![Vitest](https://img.shields.io/badge/Vitest-tested-6E9F18?logo=vitest&logoColor=white)](https://vitest.dev)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)](https://www.docker.com)
+[![Railway](https://img.shields.io/badge/Deploy-Railway-8B5CF6?logo=railway&logoColor=white)](https://railway.app)
+
+</div>
+
+> Multiple people draw on the same canvas simultaneously and see each other's strokes live, with
+> per-user undo, presence/cursors, durable persistence, and access-controlled private boards.
 
 Built as a backend-focused portfolio project: the interesting part isn't the UI, it's the CRDT
 sync protocol, the WebSocket auth gate, the persistence/compaction pipeline, and the horizontal

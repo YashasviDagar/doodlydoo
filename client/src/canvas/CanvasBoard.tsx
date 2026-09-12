@@ -11,6 +11,7 @@ import {
   pushPoints,
   readStroke,
   setText,
+  moveTextOrigin,
   updateShapeEnd,
   isShapeTool,
 } from "../yjs/schema";
@@ -67,6 +68,15 @@ export function CanvasBoard({ doc, awareness, localUserId, onReady }: Props) {
   // Latest-editor mirror so imperative commits (blur, click-elsewhere) never read a stale closure.
   const textEditorRef = useRef(textEditor);
   textEditorRef.current = textEditor;
+
+  // In-progress drag-to-move of a committed text stroke. ox/oy are the grab offset (stroke
+  // origin minus pointer so the text doesn't jump to the cursor on grab); moved only flips true
+  // past a small threshold, so a plain click still counts as a click (new editor), not a move.
+  const textDragRef = useRef<{ id: string; startX: number; startY: number; ox: number; oy: number; moved: boolean } | null>(null);
+  // Repaint helpers live inside the doc-scoped effect (they capture the ctx handles); handlers
+  // outside that effect reach them through these refs.
+  const repaintCommittedRef = useRef<(() => void) | null>(null);
+  const repaintLiveRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     if (!textEditor) return;
@@ -126,6 +136,8 @@ export function CanvasBoard({ doc, awareness, localUserId, onReady }: Props) {
     // Initial paint: covers page load with pre-existing state (local-only now; synced state
     // arrives the same way once the WsProvider applies the server's bootstrap update, Phase 2/3).
     repaintCommittedAll();
+    repaintCommittedRef.current = () => repaintCommittedAll();
+    repaintLiveRef.current = () => repaintLive();
 
     const strokesObserver = (events: Y.YEvent<any>[]) => {
       let liveDirty = false;
@@ -238,11 +250,29 @@ export function CanvasBoard({ doc, awareness, localUserId, onReady }: Props) {
 
     // Text tool: click with no editor open starts one at the clicked spot; clicking elsewhere
     // while an editor is open just COMMITS and closes - otherwise every stray click teleports the
-    // editor around the canvas, which reads as the box "moving by itself". To reposition text,
-    // re-select the tool and click deliberately.
+    // editor around the canvas, which reads as the box "moving by itself".
     if (tool === "text") {
-      if (textEditorRef.current) commitText();
-      else setTextEditor({ x, y, value: "", strokeId: null });
+      if (textEditorRef.current) {
+        commitText();
+        return;
+      }
+      // Clicking a committed text stroke grabs it for a drag-move (pulled off the committed
+      // bitmap onto the live layer so the old baked copy stops being drawn while we drag).
+      // A click that never moves past the threshold treats as a click on pointerup.
+      const hit = findTextStrokeAt(x, y);
+      if (hit) {
+        textDragRef.current = { id: hit.id, startX: x, startY: y, ox: hit.x - x, oy: hit.y - y, moved: false };
+        activeStrokeIds.current.add(hit.id);
+        // Redraw both layers in one frame: the committed level loses the baked copy (skipped
+        // while in activeStrokeIds) and the live layer picks it up at the same spot - so the
+        // grab doesn't leave a one-frame invisible-gap where the text is nowhere.
+        repaintCommittedRef.current?.();
+        repaintLiveRef.current?.();
+        activePointerId.current = e.pointerId;
+        liveRef.current!.setPointerCapture(e.pointerId);
+        return;
+      }
+      setTextEditor({ x, y, value: "", strokeId: null });
       return;
     }
 
@@ -259,6 +289,21 @@ export function CanvasBoard({ doc, awareness, localUserId, onReady }: Props) {
   function handlePointerMove(e: React.PointerEvent<HTMLCanvasElement>) {
     const [x, y] = getPos(e);
     sendCursor(x, y);
+    // Hover affordance: over a committed text stroke, the text tool cursor says "you can grab it".
+    if (toolRef.current.tool === "text" && !textDragRef.current && !textEditorRef.current && activePointerId.current === null) {
+      liveRef.current!.style.cursor = findTextStrokeAt(x, y) ? "move" : "crosshair";
+    }
+    if (textDragRef.current) {
+      const drag = textDragRef.current;
+      if (!drag.moved && (Math.abs(x - drag.startX) > 2 || Math.abs(y - drag.startY) > 2)) {
+        drag.moved = true;
+        // The stroke now belongs to the live layer; a committed repaint here drops its stale
+        // baked copy (live draws it). Without this the text renders twice - old and new position.
+        repaintCommittedRef.current?.();
+      }
+      if (drag.moved) moveTextOrigin(doc, drag.id, x + drag.ox, y + drag.oy);
+      return;
+    }
     if (!currentStrokeId.current || e.pointerId !== activePointerId.current) return;
     if (isShapeTool(toolRef.current.tool)) updateShapeEnd(doc, currentStrokeId.current, x, y);
     else pointCapture.current?.add(x, y);
@@ -268,6 +313,30 @@ export function CanvasBoard({ doc, awareness, localUserId, onReady }: Props) {
     if (e.pointerId !== activePointerId.current) return; // a stray second pointer lifting - not ours
     activePointerId.current = null;
     sendCursor(null, null, true);
+    if (textDragRef.current) {
+      const drag = textDragRef.current;
+      const [ux, uy] = getPos(e);
+      textDragRef.current = null;
+      if (drag.moved) {
+        // Drag end: finalize the move - back onto the committed bitmap at the new position.
+        activeStrokeIds.current.delete(drag.id);
+        repaintCommittedRef.current?.();
+        repaintLiveRef.current?.();
+        // Next stroke/text-drag starts a fresh undo entry regardless of timing (same reason as
+        // the stopCapturing below for normal strokes).
+        undoManagerRef.current?.stopCapturing();
+      } else {
+        // Plain click on committed text: open its editor prefilled at the stroke's position
+        // (recomputed from the pointer-up even, in case a collaborator moved it mid-gesture).
+        const hit = findTextStrokeAt(ux, uy) ?? findTextStrokeAt(drag.startX + drag.ox, drag.startY + drag.oy);
+        // Same layer swap-back as above: the grabbed stroke returns to the committed bitmap.
+        activeStrokeIds.current.delete(drag.id);
+        repaintCommittedRef.current?.();
+        repaintLiveRef.current?.();
+        if (hit) setTextEditor({ x: hit.x, y: hit.y, value: hit.text, strokeId: hit.id });
+      }
+      return;
+    }
     if (!currentStrokeId.current) return;
     const id = currentStrokeId.current;
     pointCapture.current?.reset();

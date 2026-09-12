@@ -103,6 +103,20 @@ export function updateShapeEnd(doc: Y.Doc, strokeId: string, x1: number, y1: num
   }, origin);
 }
 
+/** Live-update a text stroke's position while dragging: points stays [x,y] - delete the stale
+ * pair first, then append the new one, so remote clients see the text move in real time (same
+ * delete-then-append pattern as updateShapeEnd). Fires normal Y events, so it syncs and lands
+ * in the mover's own undo stack like any other edit. */
+export function moveTextOrigin(doc: Y.Doc, strokeId: string, x: number, y: number, origin?: unknown): void {
+  doc.transact(() => {
+    const strokeMap = getStrokesMap(doc).get(strokeId);
+    if (!strokeMap) return;
+    const points = strokeMap.get("points") as Y.Array<number>;
+    if (points.length >= 2) points.delete(0, points.length - 2);
+    points.push([x, y]);
+  }, origin);
+}
+
 /** Commits (or edits) a text stroke's string. Editing fires normal Y events, so collaborators
  * see the change live and it lands in the editor's own undo stack. */
 export function setText(doc: Y.Doc, strokeId: string, text: string, origin?: unknown): void {

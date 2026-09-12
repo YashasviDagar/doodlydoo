@@ -17,7 +17,11 @@ export async function checkDbConnection(): Promise<boolean> {
   try {
     await pool.query("select 1");
     return true;
-  } catch {
+  } catch (err) {
+    // Swallowing this silently made a production "db:down" health check undiagnosable - the
+    // only signal was the degraded status, with no reason in the logs. Log it so the actual
+    // connection error (bad URL, missing SSL, unreachable host) is visible.
+    logger.error({ err }, "db connection check failed");
     return false;
   }
 }

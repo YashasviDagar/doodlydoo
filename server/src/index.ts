@@ -7,6 +7,7 @@ import { pinoHttp } from "pino-http";
 import { env } from "./config/env.js";
 import { logger } from "./logger.js";
 import { checkDbConnection } from "./persistence/db.js";
+import { runMigrationsOnBoot } from "./db/migrate.js";
 import { attachWsServer } from "./ws/server.js";
 import { activeConnectionCount, activeRoomCount } from "./ws/roomManager.js";
 import { authRouter } from "./auth/routes.js";
@@ -68,6 +69,10 @@ app.use((err: unknown, req: express.Request, res: express.Response, _next: expre
 
 const server = http.createServer(app);
 attachWsServer(server);
+
+// Run pending migrations before accepting traffic, so a deploy against a fresh/empty database
+// doesn't come up "healthy" but unable to create a single user. Failure is logged, not fatal.
+await runMigrationsOnBoot();
 
 server.listen(env.port, () => {
   logger.info(`doodlydoo server listening on :${env.port} (${env.nodeEnv})`);

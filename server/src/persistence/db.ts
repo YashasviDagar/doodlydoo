@@ -7,17 +7,16 @@ import { logger } from "../logger.js";
 // by default - so a plain "copy the database URL" deploy fails with a refused connection and a
 // useless "db:down" health check. Local dev (127.0.0.1/localhost, e.g. the PGlite dev DB on :5433)
 // has no TLS, so it's excluded. If the URL already specifies sslmode, leave it to pg's parser.
-function poolConfigFor(url: string): pg.PoolConfig {
+export function pgConnectionConfig(url: string): pg.ClientConfig {
   const isLocal = /(^|\/\/)(localhost|127\.0\.0\.1|\[::1\])(:|\/|$)/.test(url);
   const hasSslMode = /[?&]sslmode=/i.test(url);
   return {
     connectionString: url,
-    max: env.pgPoolMax,
     ssl: isLocal || hasSslMode ? undefined : { rejectUnauthorized: false },
   };
 }
 
-export const pool = new pg.Pool(poolConfigFor(env.databaseUrl));
+export const pool = new pg.Pool({ ...pgConnectionConfig(env.databaseUrl), max: env.pgPoolMax });
 
 // Critical: node-postgres emits 'error' on the pool for problems with IDLE clients (e.g. the
 // server dropping a pooled connection that isn't in the middle of a query) - not just rejected

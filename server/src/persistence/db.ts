@@ -2,7 +2,22 @@ import pg from "pg";
 import { env } from "../config/env.js";
 import { logger } from "../logger.js";
 
-export const pool = new pg.Pool({ connectionString: env.databaseUrl, max: env.pgPoolMax });
+// Managed Postgres providers (Render, Neon, Supabase, Railway) require TLS. node-postgres only
+// turns on SSL when the connection string carries an `sslmode` parameter, and Render's URLs don't
+// by default - so a plain "copy the database URL" deploy fails with a refused connection and a
+// useless "db:down" health check. Local dev (127.0.0.1/localhost, e.g. the PGlite dev DB on :5433)
+// has no TLS, so it's excluded. If the URL already specifies sslmode, leave it to pg's parser.
+function poolConfigFor(url: string): pg.PoolConfig {
+  const isLocal = /(^|\/\/)(localhost|127\.0\.0\.1|\[::1\])(:|\/|$)/.test(url);
+  const hasSslMode = /[?&]sslmode=/i.test(url);
+  return {
+    connectionString: url,
+    max: env.pgPoolMax,
+    ssl: isLocal || hasSslMode ? undefined : { rejectUnauthorized: false },
+  };
+}
+
+export const pool = new pg.Pool(poolConfigFor(env.databaseUrl));
 
 // Critical: node-postgres emits 'error' on the pool for problems with IDLE clients (e.g. the
 // server dropping a pooled connection that isn't in the middle of a query) - not just rejected

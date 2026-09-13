@@ -1,6 +1,14 @@
-<div align="center">
+```
+      █████   ████   ████  █████  ██     ██  ██ █████   ████   ████
+      ██  ██ ██  ██ ██  ██ ██  ██ ██     ██  ██ ██  ██ ██  ██ ██  ██
+      ██  ██ ██  ██ ██  ██ ██  ██ ██      ████  ██  ██ ██  ██ ██  ██
+      ██  ██ ██  ██ ██  ██ ██  ██ ██       ██   ██  ██ ██  ██ ██  ██
+      ██  ██ ██  ██ ██  ██ ██  ██ ██       ██   ██  ██ ██  ██ ██  ██
+      ██  ██ ██  ██ ██  ██ ██  ██ ██       ██   ██  ██ ██  ██ ██  ██
+      █████   ████   ████  █████  ██████   ██   █████   ████   ████
+```
 
-# ✏️ doodlydoo
+<div align="center">
 
 *Real-time collaborative painting — draw together, see every stroke live, sync like magic.*
 
@@ -14,7 +22,7 @@
 [![Redis](https://img.shields.io/badge/Redis-DC382D?logo=redis&logoColor=white)](https://redis.io)
 [![Vitest](https://img.shields.io/badge/Vitest-tested-6E9F18?logo=vitest&logoColor=white)](https://vitest.dev)
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)](https://www.docker.com)
-[![Railway](https://img.shields.io/badge/Deploy-Railway-8B5CF6?logo=railway&logoColor=white)](https://railway.app)
+[![Render](https://img.shields.io/badge/Deploy-Render-46E3B7?logo=render&logoColor=white)](https://render.com)
 
 </div>
 
